@@ -2,6 +2,7 @@
 // Created by ljn on 20-5-27.
 //
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include "PiecewiseJerkSpeedOptimizer.hpp"
 #include "DiscretizedPath.hpp"
@@ -62,7 +63,10 @@ int main() {
         s_bounds.emplace_back(std::make_pair<double, double>(0, 60));
     }
     for (int i = 0; i != 15; ++i) {
-        s_bounds[50 + i].first = 35;
+        s_bounds[30 + i].first = 25;
+    }
+    for (int i = 0; i != 10; ++i) {
+        s_bounds[70 + i].second = 50;
     }
     std::vector<double> ref_s_list;
     for (int i = 0; i != 81; ++i) {
@@ -71,19 +75,16 @@ int main() {
     SpeedLimit speed_limit;
     double ds = 0.5, s = 0;
     while (s < 80) {
-//        if (s < 30)
-            speed_limit.AppendSpeedLimit(s, 15);
-//        else
-//            speed_limit.AppendSpeedLimit(s, 6);
+        if (s >= 30) speed_limit.AppendSpeedLimit(s, 3);
+        else speed_limit.AppendSpeedLimit(s, 15);
         s += ds;
     }
+
     PiecewiseJerkSpeedOptimizer piecewise_jerk_speed_optimizer;
     SpeedData result;
     bool speed_planning_status =
         piecewise_jerk_speed_optimizer.Process(s_bounds, s_bounds, ref_s_list, speed_limit, dt, path, 8, 0, &result);
-    std::cout << "!!!! " << speed_planning_status << std::endl;
 
-    std::cout << "by time: " << std::endl;
     double t = 0;
     while (t < 8) {
         SpeedPoint speed;
@@ -91,4 +92,29 @@ int main() {
         std::cout << "t: " << t << ", s: " << speed.s_ << ", v: " << speed.v_ << std::endl;
         t += 0.2;
     }
+
+    std::ofstream out;
+//    out.open("/home/ljn/st_test.csv");
+    out.open("../plot/st_test.csv");
+    out << "t,l,u,s" << std::endl;
+    for (int i = 0; i != s_bounds.size(); ++i) {
+        double t = i * dt;
+        SpeedPoint speed;
+        result.EvaluateByTime(t, &speed);
+        out << t << "," << s_bounds[i].first << "," << s_bounds[i].second << "," << speed.s_ << std::endl;
+    }
+    out.close();
+
+    out.open("../plot/v_test.csv");
+    out << "s,b,v" << std::endl;
+    ds = 0.3;
+    double tmp_s = 0;
+    while (tmp_s < result.TotalLength()) {
+        double limit = speed_limit.GetSpeedLimitByS(tmp_s);
+        SpeedPoint speed;
+        result.EvaluateByS(tmp_s, &speed);
+        out << tmp_s << "," << limit << "," << speed.v_ << std::endl;
+        tmp_s += ds;
+    }
+    out.close();
 }
