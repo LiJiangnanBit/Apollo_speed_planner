@@ -62,30 +62,30 @@ int main() {
         s_bounds.emplace_back(std::make_pair<double, double>(0, 60));
     }
     for (int i = 0; i != 15; ++i) {
-        s_bounds[20 + i].second = 18.0;
+        s_bounds[50 + i].first = 35;
     }
     std::vector<double> ref_s_list;
     for (int i = 0; i != 81; ++i) {
-        ref_s_list.emplace_back(8 * i * dt);
+        ref_s_list.emplace_back(15 * i * dt);
     }
     SpeedLimit speed_limit;
     double ds = 0.5, s = 0;
     while (s < 80) {
-        if (s < 30)
+//        if (s < 30)
             speed_limit.AppendSpeedLimit(s, 15);
-        else
-            speed_limit.AppendSpeedLimit(s, 6);
+//        else
+//            speed_limit.AppendSpeedLimit(s, 6);
         s += ds;
     }
     PiecewiseJerkSpeedOptimizer piecewise_jerk_speed_optimizer;
     SpeedData result;
     bool speed_planning_status =
-        piecewise_jerk_speed_optimizer.Process(s_bounds, s_bounds, ref_s_list, speed_limit, dt, path, 5, 0, &result);
+        piecewise_jerk_speed_optimizer.Process(s_bounds, s_bounds, ref_s_list, speed_limit, dt, path, 8, 0, &result);
     std::cout << "!!!! " << speed_planning_status << std::endl;
 
     std::cout << "by time: " << std::endl;
     double t = 0;
-    while (t < 5) {
+    while (t < 8) {
         SpeedPoint speed;
         result.EvaluateByTime(t, &speed);
         std::cout << "t: " << t << ", s: " << speed.s_ << ", v: " << speed.v_ << std::endl;

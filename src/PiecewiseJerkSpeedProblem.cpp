@@ -68,15 +68,6 @@ void PiecewiseJerkSpeedProblem::CalculateKernel(std::vector<c_float>* P_data,
                                     (scale_factor_[2] * scale_factor_[2]));
     ++value_index;
 
-    ///////////Try
-//    for (int i = 0; i < n - 1; ++i) {
-//        columns[2 * n + i + 1].emplace_back(2 * n + i,
-//                                        -2.0 * weight_dddx_ / delta_s_square /
-//                                            (scale_factor_[2] * scale_factor_[2]));
-//        ++value_index;
-//    }
-    ////////////
-
     for (int i = 1; i < n - 1; ++i) {
         columns[2 * n + i].emplace_back(
             2 * n + i, (weight_ddx_ + 2.0 * weight_dddx_ / delta_s_square) /
@@ -90,8 +81,6 @@ void PiecewiseJerkSpeedProblem::CalculateKernel(std::vector<c_float>* P_data,
             (scale_factor_[2] * scale_factor_[2]));
     ++value_index;
 
-// 似乎因为只需要表示下三角矩阵，就忽略掉上面的部分了？
-// 为什么有个系数2？
     // -2 * w_dddx / delta_s^2 * x(i)'' * x(i + 1)''
     for (int i = 0; i < n - 1; ++i) {
         columns[2 * n + i].emplace_back(2 * n + i + 1,
@@ -149,7 +138,7 @@ OSQPSettings* PiecewiseJerkSpeedProblem::SolverDefaultSettings() {
     settings->eps_prim_inf = 1e-5;
     settings->eps_dual_inf = 1e-5;
     settings->polish = true;
-    settings->verbose = true;
+    settings->verbose = false;
     settings->scaled_termination = true;
 
     return settings;

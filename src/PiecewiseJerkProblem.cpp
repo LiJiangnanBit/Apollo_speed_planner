@@ -238,7 +238,7 @@ OSQPSettings* PiecewiseJerkProblem::SolverDefaultSettings() {
         reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
     osqp_set_default_settings(settings);
     settings->polish = true;
-    settings->verbose = true;
+    settings->verbose = false;
     settings->scaled_termination = true;
     return settings;
 }
@@ -290,6 +290,7 @@ void PiecewiseJerkProblem::set_x_ref(const double weight_x_ref,
     CHECK_EQ(x_ref.size(), num_of_knots_);
     weight_x_ref_ = weight_x_ref;
     x_ref_ = std::move(x_ref);
+//    x_ref_ = x_ref;
     has_x_ref_ = true;
 }
 

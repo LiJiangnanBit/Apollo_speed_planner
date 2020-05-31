@@ -35,9 +35,9 @@ include_directories(
 )
 
 link_directories(osqp/lib)
-add_library(${PROJECT_NAME} include/PiecewiseJerkSpeedOptimizer.cpp include/PiecewiseJerkSpeedOptimizer.hpp
-        include/IpoptInterface.cpp include/IpoptInterface.hpp include/PiecewiseJerkProblem.cpp include/PiecewiseJerkProblem.hpp include/PiecewiseJerkSpeedProblem.cpp include/PiecewiseJerkSpeedProblem.hpp include/SpeedLimit.cpp include/SpeedLimit.hpp
-        include/SpeedPoint.cpp include/SpeedPoint.hpp include/SpeedData.cpp include/SpeedData.hpp include/math.hpp include/PathPoint.cpp include/PathPoint.hpp include/DiscretizedPath.cpp include/DiscretizedPath.hpp include/PiecewiseJerkPathProblem.cpp include/PiecewiseJerkPathProblem.hpp include/PiecewiseJerkTrajectory1d.cpp include/PiecewiseJerkTrajectory1d.hpp include/Curve1d.hpp include/ConstantJerkTrajectory1d.cpp include/ConstantJerkTrajectory1d.hpp include/math.cpp include/PiecewiseJerkSpeedNonlinearIpoptInterface.cpp include/PiecewiseJerkSpeedNonlinearIpoptInterface.hpp include/SpeedProfileGenerator.cpp include/SpeedProfileGenerator.hpp)
+add_library(${PROJECT_NAME} src/PiecewiseJerkSpeedOptimizer.cpp include/PiecewiseJerkSpeedOptimizer.hpp
+        src/IpoptInterface.cpp include/IpoptInterface.hpp src/PiecewiseJerkProblem.cpp include/PiecewiseJerkProblem.hpp src/PiecewiseJerkSpeedProblem.cpp include/PiecewiseJerkSpeedProblem.hpp src/SpeedLimit.cpp include/SpeedLimit.hpp
+        src/SpeedPoint.cpp include/SpeedPoint.hpp src/SpeedData.cpp include/SpeedData.hpp include/math.hpp src/PathPoint.cpp include/PathPoint.hpp src/DiscretizedPath.cpp include/DiscretizedPath.hpp src/PiecewiseJerkPathProblem.cpp include/PiecewiseJerkPathProblem.hpp src/PiecewiseJerkTrajectory1d.cpp include/PiecewiseJerkTrajectory1d.hpp include/Curve1d.hpp src/ConstantJerkTrajectory1d.cpp include/ConstantJerkTrajectory1d.hpp src/math.cpp src/PiecewiseJerkSpeedNonlinearIpoptInterface.cpp include/PiecewiseJerkSpeedNonlinearIpoptInterface.hpp src/SpeedProfileGenerator.cpp include/SpeedProfileGenerator.hpp)
 target_link_libraries(${PROJECT_NAME} glog ${IPOPT_LIBRARIES} ${catkin_LIBRARIES} osqp
         )
 
