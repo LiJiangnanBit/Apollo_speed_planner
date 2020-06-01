@@ -15,7 +15,7 @@
 PiecewiseJerkSpeedOptimizer::PiecewiseJerkSpeedOptimizer()
     : smoothed_speed_limit_(0, 0, 0),
       smoothed_path_curvature_(0, 0, 0) {}
-bool PiecewiseJerkSpeedOptimizer::Process(const std::vector<std::pair<double, double>> &s_bounds,
+bool PiecewiseJerkSpeedOptimizer::Process(std::vector<std::pair<double, double>> &s_bounds,
                                           const std::vector<std::pair<double, double>> &soft_s_bounds,
                                           const std::vector<double> &ref_s_list,
                                           const SpeedLimit &speed_limit,
@@ -29,6 +29,10 @@ bool PiecewiseJerkSpeedOptimizer::Process(const std::vector<std::pair<double, do
     num_of_knots_ = s_bounds.size();
     total_time_ = delta_t_ * (num_of_knots_ - 1);
     total_length_ = path.back().s_;
+    if (fabs(total_length_) < 1e-7) {
+        LOG(ERROR) << "Path length is 0!";
+        return false;
+    }
     s_init_ = 0;
     s_dot_init_ = init_v;
     s_ddot_init_ = init_a;
@@ -39,6 +43,11 @@ bool PiecewiseJerkSpeedOptimizer::Process(const std::vector<std::pair<double, do
     s_dddot_min_ = -4;
     s_dddot_max_ = 2;
 
+    for (auto &bound : s_bounds) {
+        bound.second = std::min(bound.second, total_length_);
+    }
+
+    // Smooth reference.
     std::vector<double> distance;
     std::vector<double> velocity;
     std::vector<double> acceleration;
@@ -50,6 +59,7 @@ bool PiecewiseJerkSpeedOptimizer::Process(const std::vector<std::pair<double, do
     LOG(INFO) << "speed qp optimization takes " << qp_diff.count() * 1000.0 << " ms";
     if (!qp_smooth_status) return false;
 
+    // Smooth curvature
     const auto curvature_smooth_start = std::chrono::system_clock::now();
     // using piecewise_jerk_path to fit a curve of path kappa profile
     const auto path_curvature_smooth_status = SmoothPathCurvature(path);
@@ -60,6 +70,7 @@ bool PiecewiseJerkSpeedOptimizer::Process(const std::vector<std::pair<double, do
               << curvature_smooth_diff.count() * 1000.0 << " ms";
     if (!path_curvature_smooth_status) return false;
 
+    // Smooth speed limit.
     const auto speed_limit_smooth_start = std::chrono::system_clock::now();
     const auto speed_limit_smooth_status = SmoothSpeedLimit(speed_limit);
     const auto speed_limit_smooth_end = std::chrono::system_clock::now();
@@ -69,6 +80,7 @@ bool PiecewiseJerkSpeedOptimizer::Process(const std::vector<std::pair<double, do
               << speed_limit_smooth_diff.count() * 1000.0 << " ms";
     if (!speed_limit_smooth_status) return false;
 
+    // Solve.
     const auto nlp_start = std::chrono::system_clock::now();
     const auto nlp_smooth_status =
         OptimizeByNLP(s_bounds, soft_s_bounds, &distance, &velocity, &acceleration);

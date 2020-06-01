@@ -9,11 +9,12 @@
 #include "PiecewiseJerkTrajectory1d.hpp"
 #include "SpeedLimit.hpp"
 #include "SpeedData.hpp"
+#include "DiscretizedPath.hpp"
 
 class PiecewiseJerkSpeedOptimizer {
  public:
     PiecewiseJerkSpeedOptimizer();
-    bool Process(const std::vector<std::pair<double, double>> &s_bounds,
+    bool Process(std::vector<std::pair<double, double>> &s_bounds,
                  const std::vector<std::pair<double, double>> &soft_s_bounds,
                  const std::vector<double> &ref_s_list,
                  const SpeedLimit &speed_limit,
@@ -44,8 +45,8 @@ class PiecewiseJerkSpeedOptimizer {
     double s_dot_init_;
     double s_ddot_init_;
     double s_dot_max_, s_ddot_max_, s_ddot_min_, s_dddot_max_, s_dddot_min_;
-    std::vector<std::pair<double, double>> s_bounds_;
-    std::vector<std::pair<double, double>> s_soft_bounds_;
+//    std::vector<std::pair<double, double>> s_bounds_;
+//    std::vector<std::pair<double, double>> s_soft_bounds_;
     // smoothed path curvature profile as a function of traversal distance
     PiecewiseJerkTrajectory1d smoothed_path_curvature_;
     PiecewiseJerkTrajectory1d smoothed_speed_limit_;

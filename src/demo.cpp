@@ -5,7 +5,6 @@
 #include <fstream>
 #include <vector>
 #include "PiecewiseJerkSpeedOptimizer.hpp"
-#include "DiscretizedPath.hpp"
 
 int main() {
     DiscretizedPath path;
