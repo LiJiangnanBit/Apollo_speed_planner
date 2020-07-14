@@ -3,6 +3,7 @@
 //
 #include <iostream>
 #include <fstream>
+#include <ctime>
 #include <vector>
 #include "PiecewiseJerkSpeedOptimizer.hpp"
 
@@ -56,36 +57,39 @@ int main() {
         p.s_ = s_list[i];
         path.push_back(p);
     }
-    double dt = 0.1;
+    double dt = 0.2;
     std::vector<std::pair<double, double>> s_bounds;
-    for (int i = 0; i != 81; ++i) {
+    for (int i = 0; i != 41; ++i) {
         s_bounds.emplace_back(std::make_pair<double, double>(0, 60));
     }
-    for (int i = 0; i != 15; ++i) {
-        s_bounds[30 + i].first = 25;
+    for (int i = 0; i != 4; ++i) {
+        s_bounds[7 + i].first = 10;
     }
-    for (int i = 0; i != 10; ++i) {
-        s_bounds[70 + i].second = 50;
+    for (int i = 0; i != 5; ++i) {
+        s_bounds[36 + i].second = 50;
     }
     std::vector<double> ref_s_list;
-    for (int i = 0; i != 81; ++i) {
+    for (int i = 0; i != 41; ++i) {
         ref_s_list.emplace_back(15 * i * dt);
     }
     SpeedLimit speed_limit;
     double ds = 0.5, s = 0;
     while (s < 80) {
-        if (s >= 30) speed_limit.AppendSpeedLimit(s, 3);
+        if (s >= 30) speed_limit.AppendSpeedLimit(s, 9);
         else speed_limit.AppendSpeedLimit(s, 15);
         s += ds;
     }
 
+    auto t1 = std::clock();
     PiecewiseJerkSpeedOptimizer piecewise_jerk_speed_optimizer;
     SpeedData result;
     bool speed_planning_status =
-        piecewise_jerk_speed_optimizer.Process(s_bounds, s_bounds, ref_s_list, speed_limit, dt, path, 8, 0, &result);
+        piecewise_jerk_speed_optimizer.Process(s_bounds, s_bounds, ref_s_list, speed_limit, dt, path, 7, 0, &result);
+    auto t2 = std::clock();
+    std::cout << "time: " << (double)(t2 - t1)/CLOCKS_PER_SEC << std::endl;
 
     double t = 0;
-    while (t < 8) {
+    while (t < 7) {
         SpeedPoint speed;
         result.EvaluateByTime(t, &speed);
         std::cout << "t: " << t << ", s: " << speed.s_ << ", v: " << speed.v_ << std::endl;
